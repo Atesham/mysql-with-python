@@ -1,0 +1,80 @@
+import MySQLdb as sql
+import os
+def login ():
+    conn = sql.connect(host = "localhost",database = "world",user ="root",password ="atesham")
+    cursor = conn.cursor()
+    str = "select * from bank where username = '%s'"
+    name = input("enter ur name: ")
+    password = input("enter ur passwrd: ")
+    try:
+        cursor.execute(str%name)
+        for i in cursor:
+            user = i[0]
+            passw = i[1]
+            ac = i[2]
+            bal = i[3]
+
+        if passw == password:
+            print("login success....\n Hey ",user.title())
+            print("what u want to do..?")
+            print("1.for ur details \n 2.for bank balance \n 3.deposit \n.4.for withdrawal")
+            res =int(input("Enter ur option: "))
+            if res == 1:
+                print("%s %10s %10s"%("Username","Account no","Remaining balance"))
+                print("-----------------------------")
+                print("%s %10i %10.2f"%(user.title(),ac,bal))
+                print("-----------------------------")
+
+            elif res == 2:
+                print(f"hey{user.title()} \n ur account no ending with {ac[-1:-1:-4]} has $ {bal} . ")
+
+            else:
+                print("choose form given options")
+        else:
+            print("wrong password....")
+            login()
+    except:
+        print("username not found...")
+    finally:
+        print("Thanks..")
+        cursor.close()
+        conn.close()
+def signup():
+    conn = sql.connect(host = "localhost",database = "world",user ="root",password ="atesham")
+    cursor = conn.cursor()
+    com = "insert into bank values ('%s','%s','%d','%f')"
+    name = input("enter name: ")
+    passw = input("enter ur password: ")
+    conpas = input('retype ur password: ')
+    if passw==conpas:
+        cursor.execute("select * from bank")
+        ac = cursor.rowcount+1
+        bal = float(input("Enter ur default money: "))
+        args = (name,passw,ac,bal)
+        cursor.execute(com % args)
+        conn.commit()
+        print("sign up success! \n wanna login..?")
+        res = input("type y or yes: ")
+        if res== "y" or res=="Y" or res=="YES":
+            login()
+        else:
+            print("thanks...")
+            exit()
+    else:
+        print("password not match...\nRetry...\n")
+        conn.rollback()
+        signup()
+def op():
+    print("1.login 2.sign up")
+    re = int(input(""))
+    if re == 1:
+        login()
+    elif re == 2:
+        signup()
+    else:
+        print("choose from given options...")
+        op()
+op()
+
+#login()
+#signup()
